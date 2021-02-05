@@ -1,10 +1,13 @@
 import { Module } from '@nestjs/common';
 import * as Joi from 'joi';
 import { ConfigModule } from '@nestjs/config';
-import { GraphQLModule } from '@nestjs/graphql';  // Apollo Server로 구현되어 있음
+import { GraphQLModule } from '@nestjs/graphql'; // Apollo Server로 구현되어 있음
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { Restaurant } from './restaurants/entities/restaurant.entity';
+import { UsersModule } from './users/users.module';
+import { CommonModule } from './common/common.module';
+import { User } from './users/entities/user.entity';
 
 @Module({
   imports: [
@@ -25,7 +28,7 @@ import { Restaurant } from './restaurants/entities/restaurant.entity';
       // Apollo Server 설정
       // Code first - *.graphql 파일을 만들지 않고, decorator와 Typescript class를 사용해서 GraphQL schema를 만든다.
       // autoSchemaFile을 메모리에 보관하고 싶다면 true로 한다.
-      autoSchemaFile: true // join(process.cwd(), 'src/schema.gql'),
+      autoSchemaFile: true, // join(process.cwd(), 'src/schema.gql'),
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -36,9 +39,10 @@ import { Restaurant } from './restaurants/entities/restaurant.entity';
       database: process.env.DB_DATABASE,
       synchronize: process.env.NODE_ENV !== 'prod',
       logging: true,
-      entities: [Restaurant]
+      entities: [User],
     }),
-    RestaurantsModule
+    UsersModule,
+    CommonModule,
   ],
   controllers: [],
   providers: [],
