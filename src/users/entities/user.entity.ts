@@ -27,7 +27,7 @@ export class User extends CoreEntity {
   @IsEmail()
   email: string;
 
-  @Column()
+  @Column({ select: false }) // select할떄 가져오지 않음, 가져온 entity에 대해 save를 호출하지 않
   @Field((type) => String)
   password: string;
 
@@ -43,6 +43,7 @@ export class User extends CoreEntity {
   @BeforeInsert()
   @BeforeUpdate() // update()호출시에는 안불림, update()는 entity를 거치지 않으므로 디비 서버에 쿼리만 보냄 -> save()를 사용해야 함
   async hasPassword(): Promise<void> {
+    if (!this.password) return;
     try {
       this.password = await bcrypt.hash(this.password, 10);
     } catch (e) {

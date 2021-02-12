@@ -19,7 +19,7 @@ export class Verification extends CoreEntity {
   @Field((type) => String)
   code: string;
 
-  @OneToOne((type) => User)
+  @OneToOne((type) => User, { onDelete: 'CASCADE' })
   @JoinColumn() // verification으로부터 user에 접근 (FK 생성)
   user: User;
 
