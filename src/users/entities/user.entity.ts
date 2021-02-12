@@ -36,6 +36,10 @@ export class User extends CoreEntity {
   @IsEnum(UserRole)
   role: UserRole;
 
+  @Column({ default: false })
+  @Field((type) => Boolean)
+  verified: boolean;
+
   @BeforeInsert()
   @BeforeUpdate() // update()호출시에는 안불림, update()는 entity를 거치지 않으므로 디비 서버에 쿼리만 보냄 -> save()를 사용해야 함
   async hasPassword(): Promise<void> {
