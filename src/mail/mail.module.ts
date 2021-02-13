@@ -3,9 +3,7 @@ import { CONFIG_OPTIONS } from 'src/common/common.constants';
 import { MailModuleOptions } from './mail.interfaces';
 import { MailService } from './mail.service';
 
-@Module({
-  providers: [MailService],
-})
+@Module({})
 @Global()
 export class MailModule {
   static forRoot(options: MailModuleOptions): DynamicModule {
