@@ -67,20 +67,16 @@ export class UsersService {
       const token = this.jwtService.sign(user.id);
       return { ok: true, token };
     } catch (error) {
-      return { ok: false, error };
+      return { ok: false, error: 'Could not login' };
     }
   }
 
   async findById(id: number): Promise<UserProfileOutput> {
     try {
-      const user = await this.users.findOne({ id });
-      if (user) {
-        return { ok: true, user };
-      } else {
-        return { ok: false, error: 'User Not Found' };
-      }
+      const user = await this.users.findOneOrFail({ id });
+      return { ok: true, user };
     } catch (error) {
-      return { ok: false, error };
+      return { ok: false, error: 'User Not Found' };
     }
   }
 
@@ -107,7 +103,7 @@ export class UsersService {
       await this.users.save(user);
       return { ok: true };
     } catch (error) {
-      return { ok: false, error };
+      return { ok: false, error: 'Could  not update profile.' };
     }
   }
 
@@ -125,7 +121,7 @@ export class UsersService {
       }
       return { ok: false, error: 'Not Found Verification Code' };
     } catch (error) {
-      return { ok: false, error };
+      return { ok: false, error: 'Could not verify email.' };
     }
   }
 }
