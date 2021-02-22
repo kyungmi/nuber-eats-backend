@@ -2,7 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { getConnection } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 const GRAPHQL_ENDPOINT = '/graphql';
 
@@ -19,6 +21,7 @@ const TEST_USER = {
 
 describe('UserModule (e2e)', () => {
   let app: INestApplication;
+  let usersRepository: Repository<User>;
   let token: string;
 
   beforeAll(async () => {
@@ -27,6 +30,7 @@ describe('UserModule (e2e)', () => {
     }).compile();
 
     app = modules.createNestApplication();
+    usersRepository = modules.get<Repository<User>>(getRepositoryToken(User));
     await app.init();
   });
 
@@ -139,7 +143,61 @@ describe('UserModule (e2e)', () => {
     });
   });
 
-  it.todo('userProfile');
+  describe('userProfile', () => {
+    let userId: number;
+
+    beforeAll(async () => {
+      const [user] = await usersRepository.find();
+      userId = user.id;
+    });
+
+    it("should see a user's profile", () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('X-JWT', token)
+        .send({
+          query: `{
+          userProfile(userId: ${userId}) {
+            ok
+            error
+            user {
+              id
+            }
+          }
+        }`,
+        })
+        .expect(200)
+        .expect((res) => {
+          const { userProfile } = res.body.data;
+          expect(userProfile.ok).toBe(true);
+          expect(userProfile.error).toBeNull();
+          expect(userProfile.user.id).toBe(userId);
+        });
+    });
+    it('should not find a profile', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('X-JWT', token)
+        .send({
+          query: `{
+          userProfile(userId: 99999) {
+            ok
+            error
+            user {
+              id
+            }
+          }
+        }`,
+        })
+        .expect(200)
+        .expect((res) => {
+          const { userProfile } = res.body.data;
+          expect(userProfile.ok).toBe(false);
+          expect(userProfile.error).toBe('User Not Found');
+          expect(userProfile.user).toBeNull();
+        });
+    });
+  });
 
   it.todo('me');
   it.todo('verifyEmail');
