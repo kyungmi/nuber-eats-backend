@@ -5,6 +5,7 @@ import { AppModule } from '../src/app.module';
 import { getConnection, Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { Verification } from 'src/users/entities/verification.entity';
 
 const GRAPHQL_ENDPOINT = '/graphql';
 
@@ -22,6 +23,7 @@ const TEST_USER = {
 describe('UserModule (e2e)', () => {
   let app: INestApplication;
   let usersRepository: Repository<User>;
+  let verificationRepostory: Repository<Verification>;
   let token: string;
 
   beforeAll(async () => {
@@ -31,6 +33,9 @@ describe('UserModule (e2e)', () => {
 
     app = modules.createNestApplication();
     usersRepository = modules.get<Repository<User>>(getRepositoryToken(User));
+    verificationRepostory = modules.get<Repository<Verification>>(
+      getRepositoryToken(Verification),
+    );
     await app.init();
   });
 
@@ -191,10 +196,11 @@ describe('UserModule (e2e)', () => {
         })
         .expect(200)
         .expect((res) => {
-          const { userProfile } = res.body.data;
-          expect(userProfile.ok).toBe(false);
-          expect(userProfile.error).toBe('User Not Found');
-          expect(userProfile.user).toBeNull();
+          expect(res.body.data.userProfile).toEqual({
+            ok: false,
+            error: 'User Not Found',
+            user: null,
+          });
         });
     });
   });
@@ -274,5 +280,57 @@ describe('UserModule (e2e)', () => {
         });
     });
   });
-  it.todo('verifyEmail');
+  describe('verifyEmail', () => {
+    let verificationCode: string;
+
+    beforeAll(async () => {
+      const [verification] = await verificationRepostory.find();
+      verificationCode = verification.code;
+    });
+
+    it('should verify email', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+          mutation {
+            verifyEmail(input: {
+              code: "${verificationCode}"
+            }) {
+              ok
+              error
+            }
+          }
+        `,
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.verifyEmail).toEqual({ ok: true, error: null });
+        });
+    });
+
+    it('should fail on wrong verification code not found', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+        mutation {
+          verifyEmail(input: {
+            code: "xxxxxxxxx"
+          }) {
+            ok
+            error
+          }
+        }
+      `,
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.verifyEmail).toEqual({
+            ok: false,
+            error: 'Not Found Verification Code',
+          });
+        });
+    });
+  });
 });
