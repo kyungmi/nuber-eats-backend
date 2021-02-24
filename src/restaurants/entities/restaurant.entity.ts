@@ -1,6 +1,6 @@
 // 데이터베이스의 모델
 
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
 import {
   IsBoolean,
   IsOptional,
@@ -8,39 +8,39 @@ import {
   Length,
   MinLength,
 } from 'class-validator';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { CoreEntity } from 'src/common/entities/core.entity';
+import { User } from 'src/users/entities/user.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Category } from './category.entity';
 
+@InputType('RestaurantInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
-export class Restaurant {
-  @PrimaryGeneratedColumn()
-  @Field((type) => Int)
-  id: number;
-
-  @Field((type) => String) // for graphql
+export class Restaurant extends CoreEntity {
+  @Field((type) => String) // for graphq
   @Column() // for database
   @IsString() // for DTO's validation
   @MinLength(5) // for DTO's validation
   name: string;
 
-  @Field((type) => Boolean, { nullable: true }) // defaultValue: true로 설정하면 dto에 누락된 내용을 채워서 graphql 요청, nullable: true인 경우 누락된 내용을 보내지 않음
-  @Column({ default: true }) // DB의 DDL에 디폴트 값 설정
-  @IsOptional()
-  @IsBoolean()
-  isVegan: boolean;
+  @Field((type) => String)
+  @Column()
+  @IsString()
+  coverImage: string;
 
   @Field((type) => String, { defaultValue: 'abcdefg' })
   @Column()
   @IsString()
   address: string;
 
-  @Field((type) => String)
-  @Column()
-  @IsString()
-  ownerName: string;
+  @ManyToOne((type) => Category, (category) => category.restaurants, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @Field((type) => Category, { nullable: true })
+  category: Category;
 
-  @Field((type) => String)
-  @Column()
-  @IsString()
-  categoryName: string;
+  @ManyToOne((type) => User, (user) => user.restaurants)
+  @Field((type) => User)
+  owner: User;
 }
