@@ -15,15 +15,20 @@ import { Restaurant } from './restaurant.entity';
 @Entity()
 export class Category extends CoreEntity {
   @Field((type) => String) // for graphq
-  @Column() // for database
+  @Column({ unique: true }) // for database
   @IsString() // for DTO's validation
   @MinLength(5) // for DTO's validation
   name: string;
 
-  @Field((type) => String)
-  @Column()
+  @Field((type) => String, { nullable: true })
+  @Column({ nullable: true })
   @IsString()
   coverImage: string;
+
+  @Field((type) => String)
+  @Column({ unique: true })
+  @IsString()
+  slug: string;
 
   @OneToMany((type) => Restaurant, (restaurant) => restaurant.category)
   @Field((type) => [Restaurant])

@@ -8,7 +8,7 @@ import {
 import { Restaurant } from './entities/restaurant.entity';
 import { RestaurantService } from './restaurants.service';
 
-@Resolver((of) => Restaurant) // of => Restaurant는 생략 가능
+@Resolver((of) => Restaurant)
 export class RestaurantResolver {
   constructor(private readonly restaurantService: RestaurantService) {}
 
