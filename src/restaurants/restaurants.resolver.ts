@@ -17,7 +17,6 @@ export class RestaurantResolver {
 
   @Mutation((returns) => CreateRestaurantOutput)
   @Role([UserRole.Owner])
-  @UseGuards(AuthGuard)
   createRestaurant(
     @AuthUser() authUser: User,
     @Args('input') createRestaurantInput: CreateRestaurantInput,
