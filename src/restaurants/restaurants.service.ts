@@ -15,6 +15,7 @@ import {
   EditRestaurantInput,
   EditRestaurantOutput,
 } from './dtos/edit-restaurant.dto';
+import { Category } from './entities/category.entity';
 import { Restaurant } from './entities/restaurant.entity';
 import { CategoryRepository } from './repositories/category.repository';
 
@@ -122,5 +123,9 @@ export class RestaurantService {
         error: 'Could not load categories',
       };
     }
+  }
+
+  async countRestaurant(category: Category) {
+    return this.restaurants.count({ category });
   }
 }
