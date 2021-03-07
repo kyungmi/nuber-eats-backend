@@ -9,6 +9,10 @@ import {
   CreateRestaurantOutput,
 } from './dtos/create-restaurant.dto';
 import {
+  DeleteRestaurantInput,
+  DeleteRestaurantOutput,
+} from './dtos/delete-restaurant.dto';
+import {
   EditRestaurantInput,
   EditRestaurantOutput,
 } from './dtos/edit-restaurant.dto';
@@ -31,12 +35,24 @@ export class RestaurantResolver {
     );
   }
 
-  @Mutation((returns) => CreateRestaurantOutput)
+  @Mutation((returns) => EditRestaurantOutput)
   @Role([UserRole.Owner])
   editRestaurant(
     @AuthUser() authUser: User,
     @Args('input') editRestaurantInput: EditRestaurantInput,
   ): Promise<EditRestaurantOutput> {
     return this.restaurantService.editRestaurant(authUser, editRestaurantInput);
+  }
+
+  @Mutation((returns) => DeleteRestaurantOutput)
+  @Role([UserRole.Owner])
+  delteRestaurant(
+    @AuthUser() authUser: User,
+    @Args('input') deleteRestaurantInput: DeleteRestaurantInput,
+  ): Promise<DeleteRestaurantOutput> {
+    return this.restaurantService.deleteRestaurant(
+      authUser,
+      deleteRestaurantInput,
+    );
   }
 }
