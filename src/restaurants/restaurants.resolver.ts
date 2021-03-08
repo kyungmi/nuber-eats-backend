@@ -13,6 +13,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { Role } from 'src/auth/role.decorator';
 import { User, UserRole } from 'src/users/entities/user.entity';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
+import { CategoryInput, categoryOutput } from './dtos/category.dto';
 import {
   CreateRestaurantInput,
   CreateRestaurantOutput,
@@ -79,5 +80,10 @@ export class CategoryResolver {
   @Query((type) => AllCategoriesOutput)
   allCategories(): Promise<AllCategoriesOutput> {
     return this.restaurantService.allCategories();
+  }
+
+  @Query((type) => categoryOutput)
+  category(@Args() categoryInput: CategoryInput): Promise<categoryOutput> {
+    return this.restaurantService.findCategoryBySlug(categoryInput);
   }
 }
