@@ -14,10 +14,12 @@ import {
   Column,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   RelationId,
 } from 'typeorm';
 import { Category } from './category.entity';
+import { Dish } from './dish.entity';
 
 @InputType('RestaurantInputType', { isAbstract: true })
 @ObjectType()
@@ -51,6 +53,10 @@ export class Restaurant extends CoreEntity {
   })
   @Field((type) => User)
   owner: User;
+
+  @Field((type) => [Dish])
+  @OneToMany((type) => Dish, (dish) => dish.restaurant)
+  menu: Dish[];
 
   @RelationId((restaurant: Restaurant) => restaurant.owner)
   ownerId: number;
