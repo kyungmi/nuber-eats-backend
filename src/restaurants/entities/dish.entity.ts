@@ -27,7 +27,7 @@ class DishOption {
   @Field((type) => [String], { nullable: true })
   choises?: string[];
 
-  @Field((type) => Int)
+  @Field((type) => Int, { nullable: true })
   extra: number;
 }
 
@@ -35,10 +35,10 @@ class DishOption {
 @ObjectType()
 @Entity()
 export class Dish extends CoreEntity {
-  @Field((type) => String) // for graphq
-  @Column({ unique: true }) // for database
-  @IsString() // for DTO's validation
-  @MinLength(5) // for DTO's validation
+  @Field((type) => String)
+  @Column()
+  @IsString()
+  @MinLength(5)
   name: string;
 
   @Field((type) => Int)
@@ -59,6 +59,7 @@ export class Dish extends CoreEntity {
 
   @ManyToOne((type) => Restaurant, (restaurant) => restaurant.menu, {
     onDelete: 'CASCADE',
+    nullable: false,
   })
   @Field((type) => Restaurant)
   restaurant: Restaurant;
