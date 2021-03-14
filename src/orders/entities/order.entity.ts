@@ -67,9 +67,9 @@ export class Order extends CoreEntity {
   @JoinTable() // 데이터를 어떻게 접근하냐에 따라 JoinTable을 적용하는 모델이 다름
   dishes: Dish[];
 
-  @Field((type) => Float)
-  @Column()
-  total: number;
+  @Field((type) => Float, { nullable: true })
+  @Column({ nullable: true })
+  total?: number;
 
   @Field((type) => OrderStatus)
   @Column({ type: 'enum', enum: OrderStatus })
