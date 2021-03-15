@@ -1,23 +1,23 @@
-import {
-  Field,
-  InputType,
-  ObjectType,
-  registerEnumType,
-} from '@nestjs/graphql';
+import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
 
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { Dish, DishOption } from 'src/restaurants/entities/dish.entity';
+import { Dish, DishChoise } from 'src/restaurants/entities/dish.entity';
 
 import { Column, Entity, ManyToOne } from 'typeorm';
 
-export enum OrderStatus {
-  Pending = 'Pending',
-  Cooking = 'Cooking',
-  PickedUp = 'PickedUp',
-  Delivered = 'Delivered',
-}
+@InputType('OrderItemOptionInputType', { isAbstract: true })
+@ObjectType()
+@Entity()
+export class OrderItemOption extends CoreEntity {
+  @Field((type) => String)
+  name: string;
 
-registerEnumType(OrderStatus, { name: 'OrderStatus' });
+  @Field((type) => DishChoise, { nullable: true })
+  choise?: DishChoise;
+
+  @Field((type) => Int, { nullable: true })
+  extra?: number;
+}
 
 @InputType('OrderItemInputType', { isAbstract: true })
 @ObjectType()
@@ -27,7 +27,7 @@ export class OrderItem extends CoreEntity {
   @ManyToOne((type) => Dish, { nullable: true, onDelete: 'CASCADE' })
   dish: Dish;
 
-  @Field((type) => [DishOption], { nullable: true })
+  @Field((type) => [OrderItemOption], { nullable: true })
   @Column({ type: 'json', nullable: true })
-  options?: DishOption[];
+  options?: OrderItemOption[];
 }
