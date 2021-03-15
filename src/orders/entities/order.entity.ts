@@ -8,6 +8,8 @@ import {
 } from '@nestjs/graphql';
 import {
   IsBoolean,
+  IsEnum,
+  IsNumber,
   IsOptional,
   IsString,
   Length,
@@ -27,6 +29,7 @@ import {
   PrimaryGeneratedColumn,
   RelationId,
 } from 'typeorm';
+import { OrderItem } from './order-item.entity';
 
 export enum OrderStatus {
   Pending = 'Pending',
@@ -62,16 +65,18 @@ export class Order extends CoreEntity {
   })
   restaurant: Restaurant;
 
-  @Field((type) => [Dish])
-  @ManyToMany((type) => Dish)
+  @Field((type) => [OrderItem])
+  @ManyToMany((type) => OrderItem)
   @JoinTable() // 데이터를 어떻게 접근하냐에 따라 JoinTable을 적용하는 모델이 다름
-  dishes: Dish[];
+  items: OrderItem[];
 
   @Field((type) => Float, { nullable: true })
   @Column({ nullable: true })
+  @IsNumber()
   total?: number;
 
   @Field((type) => OrderStatus)
   @Column({ type: 'enum', enum: OrderStatus })
+  @IsEnum(OrderStatus)
   status: OrderStatus;
 }
