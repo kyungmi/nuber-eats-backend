@@ -12,8 +12,8 @@ export class OrderItemOption extends CoreEntity {
   @Field((type) => String)
   name: string;
 
-  @Field((type) => DishChoise, { nullable: true })
-  choise?: DishChoise;
+  @Field((type) => String, { nullable: true })
+  choise?: string;
 
   @Field((type) => Int, { nullable: true })
   extra?: number;
