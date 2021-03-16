@@ -30,10 +30,30 @@ export class OrdersService {
       if (!restaurant) {
         return { ok: false, error: 'Restaurant not found' };
       }
-      items.forEach(async (item) => {
+      for (const item of items) {
         const dish = await this.dishes.findOne(item.dishId);
         if (!dish) {
-          // abort this whole thing
+          return {
+            ok: false,
+            error: 'Dish not found',
+          };
+        }
+        for (const itemOption of item.options) {
+          const dishOption = dish.options.find(
+            (option) => option.name === itemOption.name,
+          );
+          if (dishOption) {
+            if (dishOption.extra) {
+            } else {
+              const dishOptionChoice = dishOption.choises.find(
+                (optionChoise) => optionChoise.name === itemOption.choise,
+              );
+              if (dishOptionChoice) {
+                if (dishOptionChoice.extra) {
+                }
+              }
+            }
+          }
         }
         await this.orderItems.save(
           this.orderItems.create({
@@ -41,7 +61,7 @@ export class OrdersService {
             options: item.options,
           }),
         );
-      });
+      }
       const order = await this.orders.save(
         this.orders.create({
           customer,
