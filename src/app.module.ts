@@ -48,7 +48,11 @@ import { OrderItem } from './orders/entities/order-item.entity';
       // Code first - *.graphql 파일을 만들지 않고, decorator와 Typescript class를 사용해서 GraphQL schema를 만든다.
       // autoSchemaFile을 메모리에 보관하고 싶다면 true로 한다.
       autoSchemaFile: true, // join(process.cwd(), 'src/schema.gql'),
-      context: ({ req }) => ({ user: req.user }), // Apllo Server에서 제공하는 context를 사용하기 위해 request의 user를 context로 밀어넣음
+      context: ({ req, connection }) => {
+        if (req) {
+          return { user: req.user };
+        }
+      }, // Apllo Server에서 제공하는 context를 사용하기 위해 request의 user를 context로 밀어넣음
       installSubscriptionHandlers: true, // 웹소켓을 사용할 수 있게 해줌
     }),
     TypeOrmModule.forRoot({
