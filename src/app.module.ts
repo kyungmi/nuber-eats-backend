@@ -49,6 +49,7 @@ import { OrderItem } from './orders/entities/order-item.entity';
       // autoSchemaFile을 메모리에 보관하고 싶다면 true로 한다.
       autoSchemaFile: true, // join(process.cwd(), 'src/schema.gql'),
       context: ({ req }) => ({ user: req.user }), // Apllo Server에서 제공하는 context를 사용하기 위해 request의 user를 context로 밀어넣음
+      installSubscriptionHandlers: true, // 웹소켓을 사용할 수 있게 해줌
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
