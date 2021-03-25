@@ -49,8 +49,18 @@ import { OrderItem } from './orders/entities/order-item.entity';
       // autoSchemaFile을 메모리에 보관하고 싶다면 true로 한다.
       autoSchemaFile: true, // join(process.cwd(), 'src/schema.gql'),
       context: ({ req, connection }) => {
+        const TOKEN_KEY = 'x-jwt';
         if (req) {
-          return { user: req.user };
+          return {
+            token:
+              req.headers[TOKEN_KEY] ?? req.headers[TOKEN_KEY.toUpperCase()],
+          };
+        } else if (connection) {
+          return {
+            token:
+              connection.context[TOKEN_KEY] ??
+              connection.context[TOKEN_KEY.toUpperCase()],
+          };
         }
       }, // Apllo Server에서 제공하는 context를 사용하기 위해 request의 user를 context로 밀어넣음
       installSubscriptionHandlers: true, // 웹소켓을 사용할 수 있게 해줌
@@ -90,10 +100,4 @@ import { OrderItem } from './orders/entities/order-item.entity';
   controllers: [],
   providers: [],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(JwtMiddleware)
-      .forRoutes({ path: '/graphql', method: RequestMethod.POST });
-  }
-}
+export class AppModule {}
