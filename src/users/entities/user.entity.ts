@@ -12,6 +12,7 @@ import { IsBoolean, IsEmail, IsEnum, IsString } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { Order } from 'src/orders/entities/order.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
 
 export enum UserRole {
   Owner = 'Owner',
@@ -57,6 +58,10 @@ export class User extends CoreEntity {
   @Field((type) => [Order])
   @OneToMany((type) => Order, (order) => order.driver)
   rides: Order[];
+
+  @Field((type) => [Payment])
+  @OneToMany((type) => Payment, (payment) => payment.user)
+  payments: Payment[];
 
   @BeforeInsert()
   @BeforeUpdate() // update()호출시에는 안불림, update()는 entity를 거치지 않으므로 디비 서버에 쿼리만 보냄 -> save()를 사용해야 함
